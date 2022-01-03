@@ -113,9 +113,8 @@ trait Huffman extends HuffmanInterface:
       case x::y::xs =>
         val newNode: CodeTree = makeCodeTree(x, y)
 
-        xs.filter(isNodeWeightLt(_, newNode)) :::
-          List(newNode) :::
-          xs.filterNot(isNodeWeightLt(_, newNode))
+        val (leftOfInsertion, rightOfInsertion) = xs.span(isNodeWeightLt(_, newNode))
+        leftOfInsertion ::: (newNode :: rightOfInsertion)
       case _ => trees
     }
   }
