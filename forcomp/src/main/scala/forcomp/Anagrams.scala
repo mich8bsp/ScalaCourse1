@@ -2,6 +2,7 @@ package forcomp
 
 import forcomp.Anagrams.combinations
 
+import scala.collection.mutable
 import scala.io.{Codec, Source}
 
 object Anagrams extends AnagramsInterface:
@@ -188,6 +189,26 @@ object Anagrams extends AnagramsInterface:
     }
 
     sentencesByOccurrences(sentenceOccurrences(sentence))
+  }
+  
+  def sentenceAnagramsMemo(sentence: Sentence): List[Sentence] = {
+    val cache: mutable.Map[Occurrences, List[Sentence]] = mutable.Map[Occurrences, List[Sentence]]()
+
+    def sentencesByOccurrences(occurrences: Occurrences): List[Sentence] = cache.getOrElseUpdate(occurrences, occurrences match {
+      case Nil => List[Sentence](Nil)
+      case _ =>
+        for{
+          combinationOfOccurrences: Occurrences <- combinations(occurrences)
+          wordsForCombination: List[Word] <- dictionaryByOccurrences.get(combinationOfOccurrences).toList
+          word: Word <- wordsForCombination
+          occurrencesWithoutCurrentWord: Occurrences = subtract(occurrences, combinationOfOccurrences)
+          sentenceWithOccurrencesLeft: Sentence <- sentencesByOccurrences(occurrencesWithoutCurrentWord)
+        }yield {
+          word :: sentenceWithOccurrencesLeft
+        }
+    })
+
+    sentencesByOccurrences(sentenceOccurrences(sentence)) 
   }
 
 object Dictionary:

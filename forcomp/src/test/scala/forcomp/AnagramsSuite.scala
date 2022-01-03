@@ -93,6 +93,38 @@ class AnagramsSuite extends munit.FunSuite:
     assertEquals(sentenceAnagrams(sentence).toSet, anas.toSet)
   }
 
+  test("sentence anagrams with memoization: Linux rulez (0pts)") {
+    val sentence = List("Linux", "rulez")
+    val anas = List(
+      List("Rex", "Lin", "Zulu"),
+      List("nil", "Zulu", "Rex"),
+      List("Rex", "nil", "Zulu"),
+      List("Zulu", "Rex", "Lin"),
+      List("null", "Uzi", "Rex"),
+      List("Rex", "Zulu", "Lin"),
+      List("Uzi", "null", "Rex"),
+      List("Rex", "null", "Uzi"),
+      List("null", "Rex", "Uzi"),
+      List("Lin", "Rex", "Zulu"),
+      List("nil", "Rex", "Zulu"),
+      List("Rex", "Uzi", "null"),
+      List("Rex", "Zulu", "nil"),
+      List("Zulu", "Rex", "nil"),
+      List("Zulu", "Lin", "Rex"),
+      List("Lin", "Zulu", "Rex"),
+      List("Uzi", "Rex", "null"),
+      List("Zulu", "nil", "Rex"),
+      List("rulez", "Linux"),
+      List("Linux", "rulez")
+    )
+    var start = System.currentTimeMillis()
+    assertEquals(sentenceAnagrams(sentence).toSet, anas.toSet)
+    println(s"without memoization took ${(System.currentTimeMillis() - start)}")
+    start = System.currentTimeMillis()
+    assertEquals(sentenceAnagramsMemo(sentence).toSet, anas.toSet)
+    println(s"with memoization took ${(System.currentTimeMillis() - start)}")
+  }
+
 
   import scala.concurrent.duration.*
   override val munitTimeout = 10.seconds
