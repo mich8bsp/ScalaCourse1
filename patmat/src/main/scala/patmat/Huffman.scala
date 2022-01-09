@@ -70,9 +70,12 @@ trait Huffman extends HuffmanInterface:
    *       println("integer is  : "+ theInt)
    *   }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = chars.groupBy(identity)
+  def times(chars: List[Char]): List[(Char, Int)] = chars
     .view
-    .mapValues(_.size)
+    .groupBy(identity)
+    .map({
+      case (c, v) => c -> v.size
+    })
     .toList
 
   /**
@@ -110,6 +113,9 @@ trait Huffman extends HuffmanInterface:
    */
   def combine(trees: List[CodeTree]): List[CodeTree] = {
     trees match {
+      case x::y::Nil =>
+        val newNode: CodeTree = makeCodeTree(x, y)
+        List(newNode)
       case x::y::xs =>
         val newNode: CodeTree = makeCodeTree(x, y)
 
@@ -145,6 +151,8 @@ trait Huffman extends HuffmanInterface:
    * frequencies from that text and creates a code tree based on them.
    */
   def createCodeTree(chars: List[Char]): CodeTree = {
+    require(chars.nonEmpty, "Can't build code tree for empty text")
+
     val trees: List[CodeTree] = makeOrderedLeafList(times(chars))
     until(singleton, combine)(trees).head
   }
@@ -163,9 +171,10 @@ trait Huffman extends HuffmanInterface:
       currentDecodeTree match {
         case Leaf(char, _) => char :: decodeInner(tree, bitsLeft)
         case Fork(left, right, _, _) => bitsLeft match {
+          case Nil => Nil
           case 0 :: bs => decodeInner(left, bs)
           case 1 :: bs => decodeInner(right, bs)
-          case Nil => Nil
+          case b :: bs => throw new UnsupportedOperationException(s"Failed to decode bit $b")
         }
       }
     }
